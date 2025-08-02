@@ -3,17 +3,16 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
 # Projeyi kopyala ve restore et
-COPY *.sln .
-COPY OrderSystem.API/*.csproj ./OrderSystem.API/
-RUN dotnet restore
-
-# Projeyi build et
 COPY . .
-WORKDIR /src/OrderSystem.API
-RUN dotnet publish -c Release -o /app/publish
 
-# Runtime image - çalışma için
-FROM mcr.microsoft.com/dotnet/aspnet:9.0
+# Restore ve Publish işlemleri
+RUN dotnet restore
+RUN dotnet publish OrderSystem.API/OrderSystem.API.csproj -c Release -o /app/publish
+
+# 2. Runtime aşaması
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
 WORKDIR /app
+
 COPY --from=build /app/publish .
+
 ENTRYPOINT ["dotnet", "OrderSystem.API.dll"]
