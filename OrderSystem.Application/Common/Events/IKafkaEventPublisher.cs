@@ -2,7 +2,7 @@ using OrderSystem.Contracts.Events;
 
 namespace OrderSystem.Application.Common.Events;
 
-public interface IKafkaEventPublisher
+public interface IKafkaEventPublisher<TEvent>
 {
-    Task PublishAsync(OrderCreatedEvent evt);
+    Task PublishAsync(TEvent evt);
 }

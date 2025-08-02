@@ -12,11 +12,13 @@ using Microsoft.AspNetCore.Mvc;
 public class OrdersController : ControllerBase
 {
     private readonly CreateOrder _createOrder;
+    private readonly ShipOrder _shipOrder;
     private readonly IOrderRepository _orderRepository;
 
-    public OrdersController(CreateOrder createOrder, IOrderRepository orderRepository)
+    public OrdersController(CreateOrder createOrder, ShipOrder shipOrder,IOrderRepository orderRepository)
     {
         _createOrder = createOrder;
+        _shipOrder = shipOrder;
         _orderRepository = orderRepository;
     }
 
@@ -30,7 +32,14 @@ public class OrdersController : ControllerBase
         
         return Ok(orderId);
     }
-
+    
+    [HttpPost("ship/{id}")]
+    public async Task<IActionResult> Ship(Guid id)
+    {
+        var orderId = await _shipOrder.ExecuteAsync(id);
+        
+        return Ok(orderId);
+    }
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(Guid id)
     {
@@ -41,6 +50,7 @@ public class OrdersController : ControllerBase
         var dto = new OrderDto
         {
             Id = order.Id,
+            Status = order.Status.ToString(),
             Items = order.Items.Select(item => new OrderItemDto
             {
                 ProductId = item.ProductId,

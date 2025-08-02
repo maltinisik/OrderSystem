@@ -9,11 +9,11 @@ namespace OrderSystem.Application.UseCases;
 public class CreateOrder
 {
     private readonly IOrderRepository _orderRepository;
-    private readonly IKafkaEventPublisher _eventPublisher;
+    private readonly IKafkaEventPublisher<OrderCreatedEvent> _eventPublisher;
 
     public CreateOrder(
         IOrderRepository orderRepository,
-        IKafkaEventPublisher eventPublisher)
+        IKafkaEventPublisher<OrderCreatedEvent> eventPublisher)
     {
         _orderRepository = orderRepository;
         _eventPublisher = eventPublisher;

@@ -12,6 +12,19 @@ public class InMemoryOrderRepository : IOrderRepository
         _orders.Add(order);
         return Task.CompletedTask;
     }
+    
+    public Task UpdateAsync(Order order)
+    {
+        var existingOrderIndex = _orders.FindIndex(o => o.Id == order.Id);
+        if (existingOrderIndex == -1)
+        {
+            throw new KeyNotFoundException($"ID'si {order.Id} olan sipariş bulunamadı.");
+        }
+        
+        _orders[existingOrderIndex] = order;
+        return Task.CompletedTask;
+
+    }
 
     public Task<Order?> GetByIdAsync(Guid id)
     {

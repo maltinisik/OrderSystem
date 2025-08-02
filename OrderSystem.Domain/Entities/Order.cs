@@ -25,6 +25,14 @@ public class Order
         Status = OrderStatus.Paid;
     }
     
+    public void MarkAsShipped()
+    {
+        if (Status != OrderStatus.Created)
+            throw new InvalidOperationException("Only Newly Created Order is allowed");
+
+        Status = OrderStatus.Shipped;
+    }
+    
     public void Cancel()
     {
         if (Status != OrderStatus.Paid)
