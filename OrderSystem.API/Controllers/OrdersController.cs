@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using OrderSystem.Application.UseCases;
 using OrderSystem.Contracts;
 using OrderSystem.Domain.Entities;
@@ -23,6 +24,7 @@ public class OrdersController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize]
     public async Task<IActionResult> Create([FromBody] List<OrderItemDto> items)
     {
         if (items == null || !items.Any())
@@ -34,13 +36,16 @@ public class OrdersController : ControllerBase
     }
     
     [HttpPost("ship/{id}")]
+    [Authorize]
     public async Task<IActionResult> Ship(Guid id)
     {
         var orderId = await _shipOrder.ExecuteAsync(id);
         
         return Ok(orderId);
     }
+    
     [HttpGet("{id}")]
+    [Authorize]
     public async Task<IActionResult> GetById(Guid id)
     {
         var order = await _orderRepository.GetByIdAsync(id);

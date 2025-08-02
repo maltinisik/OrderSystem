@@ -6,6 +6,8 @@ services:
       - "2181:2181"
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
+    networks:
+      - app-network
 
   kafka:
     image: confluentinc/cp-kafka:7.6.0
@@ -18,6 +20,8 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - app-network
 
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
@@ -31,6 +35,8 @@ services:
     depends_on:
       - kafka
       - zookeeper
+    networks:
+      - app-network
 
   ordersystem-api:
     build:
@@ -42,3 +48,17 @@ services:
       - kafka
     environment:
       - Kafka__BootstrapServers=kafka:9092
+    networks:
+      - app-network
+
+  shipping-service:
+    build:
+      context: ./ShippingService
+    depends_on:
+      - kafka
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
