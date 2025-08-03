@@ -17,6 +17,7 @@ using OrderSystem.Infrastructure.Messaging;
 using OrderSystem.Infrastructure.Repositories;
 using OrderSystem.Contracts.Events;
 using OrderSystem.Infrastructure;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,6 +43,18 @@ builder.Services.AddDbContext<OrderDbContext>(options =>
  options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 //builder.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+
+
+//logger start
+Log.Logger = new LoggerConfiguration()
+ .Enrich.FromLogContext()
+ .WriteTo.Console()
+ .WriteTo.File("Logs/log.txt", rollingInterval: RollingInterval.Day)
+ .WriteTo.Seq("http://seq:80") // docker-compose kullanıyorsan seq:80 yaz
+ .CreateLogger();
+
+builder.Host.UseSerilog();
+//logger end
 
 //security
 

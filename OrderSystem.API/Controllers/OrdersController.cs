@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Logging;
 using OrderSystem.Application.UseCases;
 using OrderSystem.Contracts;
 using OrderSystem.Domain.Entities;
@@ -15,24 +16,36 @@ public class OrdersController : ControllerBase
     private readonly CreateOrder _createOrder;
     private readonly ShipOrder _shipOrder;
     private readonly IOrderRepository _orderRepository;
+    private readonly ILogger<OrdersController> _logger;
 
-    public OrdersController(CreateOrder createOrder, ShipOrder shipOrder,IOrderRepository orderRepository)
+    public OrdersController(CreateOrder createOrder, ShipOrder shipOrder,IOrderRepository orderRepository,ILogger<OrdersController> logger)
     {
         _createOrder = createOrder;
         _shipOrder = shipOrder;
         _orderRepository = orderRepository;
+        _logger = logger;
     }
 
     [HttpPost]
     [Authorize]
     public async Task<IActionResult> Create([FromBody] List<OrderItemDto> items)
     {
+        _logger.LogInformation("Sipariş oluşturma isteği alındı. Ürün sayısı: {ItemCount}", items.Count);
+
         if (items == null || !items.Any())
             return BadRequest("Sipariş kalemi girilmelidir.");
 
-        var orderId = await _createOrder.ExecuteAsync(items);
+        try
+        {
+            var orderId = await _createOrder.ExecuteAsync(items);
+            return Ok(orderId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Sipariş oluşturulurken hata oluştu.");
+            return StatusCode(500, "Bir hata oluştu");
+        }
         
-        return Ok(orderId);
     }
     
     [HttpPost("ship/{id}")]
