@@ -12,6 +12,11 @@ public class Order
     
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
+    private Order()
+    {
+        // Items zaten yukarıda boş liste olarak başlatıldı
+    }
+    
     public Order(List<OrderItem> items)
     {
         Items = items;

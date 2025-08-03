@@ -6,6 +6,8 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using OrderSystem.Application.Common.Events;
@@ -14,12 +16,14 @@ using OrderSystem.Domain.Repositories;
 using OrderSystem.Infrastructure.Messaging;
 using OrderSystem.Infrastructure.Repositories;
 using OrderSystem.Contracts.Events;
+using OrderSystem.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.WebHost.UseUrls("http://*:5000");
 
-builder.Services.AddSingleton<IOrderRepository, InMemoryOrderRepository>();
+//builder.Services.AddSingleton<IOrderRepository, InMemoryOrderRepository>();
+builder.Services.AddScoped<IOrderRepository, EfOrderRepository>();
 builder.Services.AddScoped<CreateOrder>();
 builder.Services.AddScoped<ShipOrder>();
 
@@ -32,6 +36,10 @@ builder.Services.AddSingleton<IKafkaEventPublisher<OrderCreatedEvent>>(
 builder.Services.AddSingleton<IKafkaEventPublisher<OrderShippedEvent>>(
  new KafkaEventPublisher<OrderShippedEvent>("kafka:9092","order-shipped")
 );
+
+//db connection
+builder.Services.AddDbContext<OrderDbContext>(options =>
+ options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 //builder.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
 

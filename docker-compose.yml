@@ -38,6 +38,21 @@ services:
     networks:
       - app-network
 
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: yourpassword
+      POSTGRES_DB: ordersystemdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
   ordersystem-api:
     build:
       context: .
@@ -46,8 +61,10 @@ services:
       - "5000:5000"
     depends_on:
       - kafka
+      - postgres
     environment:
       - Kafka__BootstrapServers=kafka:9092
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=ordersystemdb;Username=postgres;Password=yourpassword
     networks:
       - app-network
 
@@ -62,3 +79,6 @@ services:
 networks:
   app-network:
     driver: bridge
+
+volumes:
+  postgres-data:
