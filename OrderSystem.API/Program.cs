@@ -27,6 +27,7 @@ builder.WebHost.UseUrls("http://*:5000");
 builder.Services.AddScoped<IOrderRepository, EfOrderRepository>();
 builder.Services.AddScoped<CreateOrder>();
 builder.Services.AddScoped<ShipOrder>();
+builder.Services.AddScoped<PayOrder>();
 
 builder.Services.AddControllers();
 
@@ -87,4 +88,3 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.Run(); // <-- BU SATIR MUTLAKA OLMALI
-

@@ -8,7 +8,7 @@ public class Order
     
     public List<OrderItem> Items { get; private set; }
 
-    public OrderStatus Status { get; private set; } = OrderStatus.Created;
+    public OrderStatus Status { get; set; } = OrderStatus.Created;
     
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
@@ -25,15 +25,20 @@ public class Order
     public void MarkAsPaid()
     {
         if (Status != OrderStatus.Created)
-            throw new InvalidOperationException("Only Newly Created Order is allowed");
+            throw new InvalidOperationException("Only Newly Created Order is allowed! Status=" + Status);
 
         Status = OrderStatus.Paid;
     }
     
+    public bool isPaid()
+    {
+        return Status == OrderStatus.Paid;
+    }
+    
     public void MarkAsShipped()
     {
-        if (Status != OrderStatus.Created)
-            throw new InvalidOperationException("Only Newly Created Order is allowed");
+        if (Status != OrderStatus.Paid)
+            throw new InvalidOperationException("Only Paid Order is allowed! Status=" + Status);
 
         Status = OrderStatus.Shipped;
     }

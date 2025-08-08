@@ -18,7 +18,7 @@ public class CreateOrder
         _orderRepository = orderRepository;
         _eventPublisher = eventPublisher;
     }
-
+    
     public async Task<Guid> ExecuteAsync(List<OrderItemDto> items)
     {
         var domainItems = items.Select(dto => new OrderItem

@@ -15,19 +15,21 @@ public class OrdersController : ControllerBase
 {
     private readonly CreateOrder _createOrder;
     private readonly ShipOrder _shipOrder;
+    private readonly PayOrder _payOrder;
     private readonly IOrderRepository _orderRepository;
     private readonly ILogger<OrdersController> _logger;
 
-    public OrdersController(CreateOrder createOrder, ShipOrder shipOrder,IOrderRepository orderRepository,ILogger<OrdersController> logger)
+    public OrdersController(CreateOrder createOrder, ShipOrder shipOrder, PayOrder payOrder, IOrderRepository orderRepository,ILogger<OrdersController> logger)
     {
         _createOrder = createOrder;
         _shipOrder = shipOrder;
+        _payOrder = payOrder;
         _orderRepository = orderRepository;
         _logger = logger;
     }
 
     [HttpPost]
-    [Authorize]
+    //[Authorize]
     public async Task<IActionResult> Create([FromBody] List<OrderItemDto> items)
     {
         _logger.LogInformation("Sipariş oluşturma isteği alındı. Ürün sayısı: {ItemCount}", items.Count);
@@ -49,16 +51,27 @@ public class OrdersController : ControllerBase
     }
     
     [HttpPost("ship/{id}")]
-    [Authorize]
+    //[Authorize]
     public async Task<IActionResult> Ship(Guid id)
     {
+        _logger.LogInformation("Ship isteği alındı. Ürün sayısı: Id {Id}", id);
+        
         var orderId = await _shipOrder.ExecuteAsync(id);
         
         return Ok(orderId);
     }
+ 
+    [HttpPost("pay/{id}")]
+    //[Authorize]
+    public async Task<IActionResult> Pay(Guid id)
+    {
+        var orderId = await _payOrder.ExecuteAsync(id);
+        
+        return Ok(orderId);
+    }    
     
     [HttpGet("{id}")]
-    [Authorize]
+    //[Authorize]
     public async Task<IActionResult> GetById(Guid id)
     {
         var order = await _orderRepository.GetByIdAsync(id);

@@ -32,7 +32,7 @@ public class EfOrderRepository : IOrderRepository
         //_context.OrderItems.RemoveRange(existingOrder.Items);
         //existingOrder.Items = updatedOrder.Items;
 
-        existingOrder.MarkAsShipped();
+        existingOrder.Status = updatedOrder.Status;
         
         await _context.SaveChangesAsync();
     }    
